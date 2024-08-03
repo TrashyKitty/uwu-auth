@@ -1,6 +1,6 @@
 module github.com/Ant767/AuthBackend
 
-go 1.22.0
+go 1.23
 
 require (
 	github.com/bytedance/sonic v1.12.0 // indirect
