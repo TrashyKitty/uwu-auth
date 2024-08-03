@@ -11,11 +11,11 @@ import (
 type RegisterRequestBody struct {
 	Username string `json:"username"`
 	Handle   string `json:"handle"`
-	Email    string `json:"handle"`
-	Password string `json:"handle"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
-func RegisterRoute(c *gin.Context) {
+func RegisterRoute(c *gin.Context, resendKey string) {
 	var body RegisterRequestBody
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -23,7 +23,7 @@ func RegisterRoute(c *gin.Context) {
 		return
 	}
 
-	err := auth.RegisterAccount(db.GetUsersCollection(), body.Handle, body.Username, body.Password, body.Email)
+	err := auth.RegisterAccount(resendKey, db.GetUsersCollection(), body.Handle, body.Username, body.Password, body.Email)
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"error": true, "message": err.Error()})

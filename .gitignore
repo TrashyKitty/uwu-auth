@@ -2,3 +2,9 @@ go.sum
 run.bat
 testing.rest
 main.exe
+production.rest
+AuthServer.exe
+config.json
+run.bat
+testy.html
+uploads

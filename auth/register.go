@@ -3,14 +3,16 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Ant767/AuthBackend/utils"
 	"github.com/google/uuid"
+	"github.com/resend/resend-go/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func RegisterAccount(collection *mongo.Collection, handle string, username string, password string, email string) error {
+func RegisterAccount(resendKey string, collection *mongo.Collection, handle string, username string, password string, email string) error {
 	handleFilter := bson.D{{"handle", handle}}
 	handleFilter2 := bson.D{{"email", email}}
 
@@ -21,9 +23,10 @@ func RegisterAccount(collection *mongo.Collection, handle string, username strin
 
 	if err != nil && err2 != nil {
 		if err == mongo.ErrNoDocuments && err2 == mongo.ErrNoDocuments {
-			_, hashedPassword := utils.HashPassword(password)
+			hashedPassword, _ := utils.HashPassword(password)
 
 			userID := uuid.New()
+			verificationCode := uuid.New()
 			token := utils.MakeToken(userID.String())
 			if token == "" {
 				return errors.New("Failed to generate token")
@@ -33,13 +36,30 @@ func RegisterAccount(collection *mongo.Collection, handle string, username strin
 				{"handle", handle},
 				{"password", hashedPassword},
 				{"email", email},
+				{"role", 0},
 				{"id", userID.String()},
 				{"token", token},
+				{"verificationCode", verificationCode.String()},
+				{"verified", false},
 			}
 			_, err3 := collection.InsertOne(context.TODO(), document)
 			if err3 != nil {
 				return err3
 			}
+
+			client := resend.NewClient(resendKey)
+
+			params := &resend.SendEmailRequest{
+				To:      []string{email},
+				From:    "accounts@trashdev.org",
+				Subject: "Verify your account",
+				Html:    fmt.Sprintf("Verify your trashdev account by clicking <a href=\"https://auth.trashdev.org/verify/%s\">this link</a>", verificationCode.String()),
+			}
+
+			sent, _ := client.Emails.Send(params)
+
+			fmt.Println(sent.Id)
+
 			return nil
 		}
 
