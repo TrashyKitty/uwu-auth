@@ -1,10 +1,11 @@
 package db
 
 import (
-    "go.mongodb.org/mongo-driver/mongo"
-    "go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 	"context"
+	"log"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var Client *mongo.Client
@@ -22,4 +23,12 @@ func CreateDBClient() {
 
 func GetUsersCollection() *mongo.Collection {
 	return Client.Database("trashauth").Collection("Users")
+}
+
+func GetChatsCollection() *mongo.Collection {
+	return Client.Database("trashauth").Collection("Chats")
+}
+
+func GetMessagesCollection() *mongo.Collection {
+	return Client.Database("trashauth").Collection("Messages")
 }

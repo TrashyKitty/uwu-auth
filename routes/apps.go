@@ -27,8 +27,31 @@ var apps = []App{
 	},
 }
 
+type Role struct {
+	Name  string `json:"name"`
+	Power int    `json:"power"`
+}
+
+var roles = map[int]Role{
+	0: {
+		Name:  "Member",
+		Power: 0,
+	},
+	1: {
+		Name:  "Owner",
+		Power: 10,
+	},
+	2: {
+		Name:  "Founder",
+		Power: 20,
+	},
+}
+
 func GetAppsList(c *gin.Context) {
 	c.JSON(200, apps)
+}
+func GetRolesList(c *gin.Context) {
+	c.JSON(200, roles)
 }
 
 type CreateAppAssociationRequest struct {

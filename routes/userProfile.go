@@ -15,15 +15,23 @@ import (
 )
 
 func UpdateImage(c *gin.Context, fileField string, databaseField string) {
-	file, header, err := c.Request.FormFile(fileField)
+	file, header, err2 := c.Request.FormFile(fileField)
 	token := c.Request.FormValue("token")
-
+	// buff := make([]byte, 512)
+	// if _, err := file.Read(buff); err != nil {
+	// 	fmt.Println(err) // do something with that error
+	// 	return
+	// }
+	// fileType := http.DetectContentType(buff)
+	// if !strings.HasPrefix(fileType, "image") {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "File is not image you fucking dumbass"})
+	// }
 	if token == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
 	}
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err2.Error()})
 		return
 	}
 
@@ -66,4 +74,90 @@ func UpdateProfilePicture(c *gin.Context) {
 
 func UpdateProfileBanner(c *gin.Context) {
 	UpdateImage(c, "banner", "bannerFile")
+}
+
+func UpdateProfileBackground(c *gin.Context) {
+	UpdateImage(c, "background", "backgroundFile")
+}
+
+func UpdateBio(c *gin.Context) {
+	bio := c.Request.FormValue("bio")
+	token := c.Request.FormValue("token")
+
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
+	}
+
+	filter := bson.D{{"token", token}}
+	update := bson.D{
+		{"$set", bson.D{
+			{"bio", bio},
+		}},
+	}
+
+	collection := db.GetUsersCollection()
+
+	_, updateErr := collection.UpdateOne(context.TODO(), filter, update)
+
+	if updateErr != nil {
+		c.JSON(http.StatusOK, gin.H{"error": updateErr.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
+
+}
+func UpdateStatus(c *gin.Context) {
+	bio := c.Request.FormValue("bio")
+	token := c.Request.FormValue("token")
+
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
+	}
+
+	filter := bson.D{{"token", token}}
+	update := bson.D{
+		{"$set", bson.D{
+			{"status", bio},
+		}},
+	}
+
+	collection := db.GetUsersCollection()
+
+	_, updateErr := collection.UpdateOne(context.TODO(), filter, update)
+
+	if updateErr != nil {
+		c.JSON(http.StatusOK, gin.H{"error": updateErr.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
+
+}
+func UpdatePronouns(c *gin.Context) {
+	bio := c.Request.FormValue("bio")
+	token := c.Request.FormValue("token")
+
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
+	}
+
+	filter := bson.D{{"token", token}}
+	update := bson.D{
+		{"$set", bson.D{
+			{"pronouns", bio},
+		}},
+	}
+
+	collection := db.GetUsersCollection()
+
+	_, updateErr := collection.UpdateOne(context.TODO(), filter, update)
+
+	if updateErr != nil {
+		c.JSON(http.StatusOK, gin.H{"error": updateErr.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
+
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/Ant767/AuthBackend/utils"
 	"github.com/google/uuid"
@@ -12,7 +13,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func isValidHandle(handle string) bool {
+	// Define the regex pattern to match lowercase letters, numbers, _, -, and .
+	pattern := `^[a-z0-9_.-]+$`
+
+	// Compile the regex
+	re := regexp.MustCompile(pattern)
+
+	// Check if the handle matches the pattern
+	return re.MatchString(handle)
+}
 func RegisterAccount(resendKey string, collection *mongo.Collection, handle string, username string, password string, email string) error {
+	if !isValidHandle(handle) {
+		return errors.New("Handle can only be lowercase leetters, numbers, underscores (_), hyphens (-), and periods (.)")
+	}
 	handleFilter := bson.D{{"handle", handle}}
 	handleFilter2 := bson.D{{"email", email}}
 

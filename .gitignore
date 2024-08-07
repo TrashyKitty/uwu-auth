@@ -8,3 +8,5 @@ config.json
 run.bat
 testy.html
 uploads
+AuthServer-Linux
+AuthServer-Windows.exe
